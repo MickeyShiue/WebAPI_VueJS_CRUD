@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.3/vue.js"></script>
+</head>
+<body>
+    <div id="app">      
+            <label>電子郵件</label>
+            <input type="text" v-model="Email" />
+            <br />
+            <label>姓名</label>
+            <input type="text" v-model="Name" />
+            <br />
+            <label>性別</label>
+            <input type="text" v-model="Gender" />
+            <br />
+            <label>生日</label>
+            <input type="text" v-model="Birthday" />
+            <br />
+            <label>電話號碼</label>
+            <input type="text" v-model="PhoneNum" />
+            <br />
+            <label>地址</label>
+            <input type="text" v-model="Address" />
+            <br />
+            <button @click="submit">新增</button>       
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                Email: '',
+                Name: '',
+                Gender: '',
+                Birthday: '',
+                PhoneNum: '',
+                Address:'',
+            },
+            methods: {
+                submit() {
+                    $.ajax({
+                        url: 'http://localhost:61883/api/User',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            'Email': this.Email,
+                            'Name': this.Name,
+                            'Gender': this.Gender,
+                            'Birthday': this.Birthday,
+                            'PhoneNum': this.PhoneNum,
+                            'Address':this.Address
+                        },
+                        error: function (xhr) {
+                            alert('Ajax request 發生錯誤' + xhr);
+                            console.log(xhr);
+                        },
+                        success: function (response) {
+                            alert('新增成功');
+                            window.location = '/index.html';
+                        }
+                    });
+
+                }
+            }
+        })
+    </script>
+</body>
+</html>

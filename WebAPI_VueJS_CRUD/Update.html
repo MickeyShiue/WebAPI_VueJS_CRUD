@@ -1,0 +1,86 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.3/vue.js"></script>
+</head>
+<body>
+    <div id="app">
+
+        <label>姓名</label>
+        <input type="text" v-model="Name" />
+        <br />
+        <label>性別</label>
+        <input type="text" v-model="Gender" />
+        <br />
+        <label>生日</label>
+        <input type="text" v-model="Birthday" />
+        <br />
+        <label>電話號碼</label>
+        <input type="text" v-model="PhoneNum" />
+        <br />
+        <label>地址</label>
+        <input type="text" v-model="Address" />
+        <br />
+        <button @click="submit">修改</button>
+
+    </div>
+
+    <script>
+
+        const QuerystringEmail = location.toString().replace('http://localhost:61883/update.html?Email=','').toString();
+
+        new Vue({
+            el: '#app',
+            data: {
+                Name: '',
+                Gender: '',
+                Birthday: '',
+                PhoneNum: '',
+                Address:'',
+            },
+
+            created() {
+                var self = this;
+                var api = 'http://localhost:61883/api/User?Email=' + QuerystringEmail
+                $.get(api, function (data) {    
+                    self.Name = data.Name;
+                    self.Gender = data.Gender;
+                    self.Birthday = data.Birthday;
+                    self.PhoneNum = data.PhoneNum;
+                    self.Address = data.Address;
+                });
+            },
+            methods: {
+                submit() {
+                    $.ajax({
+                        url: 'http://localhost:61883/api/User',
+                        type: 'PUT',
+                        dataType: 'json',
+                        data: {
+                            'Email': QuerystringEmail,
+                            'Name': this.Name,
+                            'Gender': this.Gender,
+                            'Birthday': this.Birthday,
+                            'PhoneNum': this.PhoneNum,
+                            'Address': this.Address
+                        },
+                        error: function (xhr) {
+                            alert('Ajax request 發生錯誤' + xhr);
+                            console.log(xhr);
+                        },
+                        success: function (response) {
+                            alert('修改成功');
+                            window.location = '/index.html';
+                        }
+                    });                  
+                }
+            }
+        })
+
+    </script>
+
+</body>
+</html>

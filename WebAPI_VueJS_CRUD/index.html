@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+    <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.3/vue.js"></script>
+    <meta charset="utf-8">
+    <style>
+        body {
+            padding: 1em;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <button @click="Addlocation">新增資料</button>
+        <table class="table table-condensed">
+            <tr>
+                <th>電子信箱</th>
+                <th>姓名</th>
+                <th>性別</th>
+                <th>生日</th>
+                <th>電話號碼</th>
+                <th>地址</th>
+                <th>修改</th>
+                <th>刪除</th>
+            </tr>
+            <tr v-for="(row, index) in rows.slice(pageStart, pageStart + countOfPage)">
+                <td>{{ row.Email }}</td>
+                <td>{{ row.Name }}</td>
+                <td>{{ row.Gender }}</td>
+                <td>{{ row.Birthday }}</td>
+                <td>{{ row.PhoneNum }}</td>
+                <td>{{ row.Address }}</td>
+                <td><a :href="`/update.html?Email=${row.Email}`">修改</a></td>
+                <td><a href="#"@click.prevent="Delete(row.Email)">刪除</a></td>
+            </tr>
+        </table>
+
+        <div class="pagination">
+            <ul>
+                <li v-bind:class="{'disabled': (currPage === 1)}" @click.prevent="setPage(currPage-1)"><a href="#">Prev</a></li>
+                <li v-for="n in totalPage" v-bind:class="{'active': (currPage === (n))}" @click.prevent="setPage(n)"><a href="#">{{n}}</a></li>
+                <li v-bind:class="{'disabled': (currPage === totalPage)}" @click.prevent="setPage(currPage+1)"><a href="#">Next</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                rows: [],
+                countOfPage: 10,
+                currPage: 1,
+                filter_name: ''
+            },
+            computed: {
+                pageStart() {
+                    return (this.currPage - 1) * this.countOfPage;
+                },
+                totalPage: function () {
+                    return Math.ceil(this.rows.length / this.countOfPage);
+                }
+            },
+            methods: {
+
+                Addlocation() {
+                    window.location='/Create.html'
+                },
+                setPage(idx) {
+                    if (idx <= 0 || idx > this.totalPage) {
+                        return;
+                    }
+                    this.currPage = idx;
+                },
+                Delete(Email) {
+                    let flag = confirm("確認要刪除此筆資料嗎?");
+                    if (flag == true) {
+                        $.ajax({
+                            url: 'http://localhost:61883/api/User?Email=' + Email ,
+                            type: 'DELETE',
+                            error: function (xhr) {
+                                alert('Ajax request 發生錯誤' + xhr);
+                                console.log(xhr);
+                            },
+                            success: function (response) {
+                                alert('刪除成功');
+                            }
+                        });
+                    }
+                }
+            },
+            mounted() {
+                var self = this;
+                $.get('http://localhost:61883/api/User', function (data) {
+                    self.rows = data;
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
